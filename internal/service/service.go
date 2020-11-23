@@ -55,7 +55,11 @@ func (s *Service) GetSourceLink(ctx context.Context, req GetSourceLinkRequest) (
 		// TODO: log error
 	}
 
-	id := s.Codec.Decode(req.Hash)
+	id, err := s.Codec.Decode(req.Hash)
+	if err != nil {
+		return GetSourceLinkResponse{}, err
+	}
+
 	link, err := s.Store.Get(id)
 	if err != nil {
 		return GetSourceLinkResponse{}, err

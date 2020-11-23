@@ -34,7 +34,7 @@ func (s *Store) Connect() error {
 	db.SetMaxIdleConns(s.MaxIdleConns)
 	s.db = db
 
-	return nil
+	return s.Init()
 }
 
 func (s *Store) Close() error {
@@ -45,7 +45,7 @@ const (
 	initQuery = `CREATE TABLE IF NOT EXISTS links (
 		id SERIAL PRIMARY KEY,
 		source text NOT NULL,
-		CONSTRAINT	unique_source UNIQUE(source)`
+		CONSTRAINT	unique_source UNIQUE(source))`
 
 	createQuery = "INSERT INTO links (source) VALUES ($1) RETURNING id"
 	selectQuery = "SELECT * FROM links WHERE id = $1"

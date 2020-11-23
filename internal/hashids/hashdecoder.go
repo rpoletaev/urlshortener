@@ -1,6 +1,8 @@
 package hashids
 
 import (
+	"urlshortener/internal"
+
 	"github.com/speps/go-hashids"
 )
 
@@ -26,7 +28,12 @@ func (d Decoder) Encode(id uint) string {
 	return hash
 }
 
-func (d Decoder) Decode(hash string) uint {
+func (d Decoder) Decode(hash string) (id uint, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = internal.ErrNotFound
+		}
+	}()
 	ids := d.hasher.Decode(hash)
-	return uint(ids[0])
+	return uint(ids[0]), nil
 }

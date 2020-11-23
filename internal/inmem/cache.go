@@ -6,7 +6,7 @@ import (
 )
 
 type Config struct {
-	InitMapLength int `envconfig:"INIT_MAP_LEN"`
+	InitMapLength int `envconfig:"CACHE_LEN"`
 }
 
 func New(c Config) *Cache {

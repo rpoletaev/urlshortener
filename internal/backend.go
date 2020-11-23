@@ -12,7 +12,7 @@ type Store interface {
 
 type HashCodec interface {
 	Encode(id uint) string
-	Decode(hash string) uint
+	Decode(hash string) (uint, error)
 }
 
 type Cache interface {
