@@ -2,7 +2,10 @@ package service
 
 import (
 	"context"
+	"net/url"
 	"urlshortener/internal"
+
+	"github.com/pkg/errors"
 )
 
 type Config struct {
@@ -25,6 +28,14 @@ type CreateLinkResponse struct {
 }
 
 func (s *Service) CreateShortLink(cxt context.Context, req CreateLinkRequest) (CreateLinkResponse, error) {
+
+	url, err := url.Parse(req.Link)
+	if err != nil {
+		return CreateLinkResponse{}, errors.Wrap(internal.ErrBadRequest, err.Error())
+	}
+	if len(url.Scheme) == 0 {
+		return CreateLinkResponse{}, errors.Wrap(internal.ErrBadRequest, "empty scheme")
+	}
 	id, err := s.Store.Create(req.Link)
 	if err != nil {
 		return CreateLinkResponse{}, err

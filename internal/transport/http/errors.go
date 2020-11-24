@@ -16,5 +16,8 @@ func errorCode(err error) int {
 		return http.StatusNotFound
 	}
 
+	if errors.Cause(err) == internal.ErrBadRequest {
+		return http.StatusBadRequest
+	}
 	return http.StatusInternalServerError
 }
