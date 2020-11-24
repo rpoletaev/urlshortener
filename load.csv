@@ -1,0 +1,5 @@
+POST,http://localhost:3001/link,"{""link"":""http://linux.org.ru""}",Content-type: application/json
+POST,http://localhost:3001/link,"{""link"":""http://github.com""}",Content-type: application/json
+POST,http://localhost:3001/link,"{""link"":""http://mail.ru""}",Content-type: application/json
+GET,http://localhost:3001/link/D6Ek,,
+GET,http://localhost:3001/link/someCode,,
