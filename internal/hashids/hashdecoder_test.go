@@ -18,8 +18,10 @@ func TestCheckDecodeEncode(t *testing.T) {
 
 	for _, v := range tests {
 		hash := codec.Encode(v)
-		id := codec.Decode(hash)
-
+		id, err := codec.Decode(hash)
+		if err != nil {
+			t.Error(err)
+		}
 		assert.Equal(t, v, id)
 	}
 }
