@@ -19,3 +19,7 @@ curl 'localhost:3001/link/' -H 'Content-Type: application/json' -X POST --data-r
 
 ### мерил с помощью:
     https://github.com/americanexpress/baton
+
+### Пути для статистики
+/stat/ip
+/stat/url

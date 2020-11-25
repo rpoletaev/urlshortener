@@ -4,9 +4,11 @@ package main
 
 import (
 	"urlshortener/internal"
+	"urlshortener/internal/builtin"
 	"urlshortener/internal/hashids"
 	"urlshortener/internal/inmem"
 	"urlshortener/internal/postgres"
+	"urlshortener/internal/redis"
 	"urlshortener/internal/service"
 	"urlshortener/internal/transport/http"
 
@@ -36,6 +38,20 @@ func provideCache(c *Config) *inmem.Cache {
 	return inmem.New(*c.Inmem)
 }
 
+func provideRedis(c *Config) *redis.Backend {
+	return &redis.Backend{
+		Config: c.Redis,
+	}
+}
+
+func provideIPExtractor() http.RealIPExtractor {
+	return http.RealIPExtractor{}
+}
+
+func pnovideTimeFunc() builtin.TimeFunc {
+	return builtin.TimeFunc{}
+}
+
 func provideApp(logger zerolog.Logger, c *Config) *App {
 	wire.Build(
 		providePostgres,
@@ -43,12 +59,18 @@ func provideApp(logger zerolog.Logger, c *Config) *App {
 		provideServiceConfig,
 		provideHashDecoder,
 		provideCache,
+		provideRedis,
+		provideIPExtractor,
+		pnovideTimeFunc,
 		wire.Struct(new(App), "*"),
 		wire.Struct(new(http.Api), "*"),
 		wire.Struct(new(service.Service), "*"),
 		wire.Bind(new(internal.Store), new(*postgres.Store)),
 		wire.Bind(new(internal.Cache), new(*inmem.Cache)),
 		wire.Bind(new(internal.HashCodec), new(hashids.Decoder)),
+		wire.Bind(new(internal.Hll), new(*redis.Backend)),
+		wire.Bind(new(http.IPExtractor), new(http.RealIPExtractor)),
+		wire.Bind(new(internal.TimeFunc), new(builtin.TimeFunc)),
 	)
 
 	return &App{}

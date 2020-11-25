@@ -4,6 +4,7 @@ import (
 	"urlshortener/internal/hashids"
 	"urlshortener/internal/inmem"
 	"urlshortener/internal/postgres"
+	"urlshortener/internal/redis"
 	"urlshortener/internal/service"
 	"urlshortener/internal/transport/http"
 
@@ -18,6 +19,7 @@ type Config struct {
 	Inmem     *inmem.Config    `envconfig:"INMEM"`
 	HTTP      *http.Config     `envconfig:"HTTP"`
 	Service   *service.Config  `envconfig:"SERVICE"`
+	Redis     *redis.Config    `envconfig:"REDIS"`
 }
 
 func LoadConfig(prefix string) (*Config, error) {

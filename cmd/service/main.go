@@ -44,10 +44,12 @@ func main() {
 
 	quit := make(chan os.Signal, 1)
 
-	signal.Notify(quit, syscall.SIGHUP,
+	signal.Notify(quit,
+		syscall.SIGHUP,
 		syscall.SIGINT,
 		syscall.SIGTERM,
-		syscall.SIGQUIT)
+		syscall.SIGQUIT,
+	)
 
 	<-quit
 	logger.Info().Msg("shutdown server ...")

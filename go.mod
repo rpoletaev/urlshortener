@@ -3,6 +3,7 @@ module urlshortener
 go 1.14
 
 require (
+	github.com/gomodule/redigo v1.8.3
 	github.com/google/wire v0.4.0
 	github.com/gorilla/mux v1.8.0
 	github.com/jmoiron/sqlx v1.2.0

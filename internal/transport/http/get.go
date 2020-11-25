@@ -22,5 +22,23 @@ func (api *Api) getLink(wr http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go func() {
+		rec := service.AddIPStatRequest{
+			IP: api.IpExtractor.GetIP(r),
+		}
+		if err := api.Svc.AddIPStat(r.Context(), rec); err != nil {
+			// TODO: log error
+		}
+	}()
+
+	go func() {
+		rec := service.AddURLStatRequest{
+			URL: r.RequestURI,
+		}
+
+		if err := api.Svc.AddURLStatu(r.Context(), rec); err != nil {
+			// TODO: log error
+		}
+	}()
 	http.Redirect(wr, r, resp.Link, http.StatusMovedPermanently)
 }

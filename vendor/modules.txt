@@ -1,5 +1,8 @@
 # github.com/davecgh/go-spew v1.1.0
 github.com/davecgh/go-spew/spew
+# github.com/gomodule/redigo v1.8.3
+## explicit
+github.com/gomodule/redigo/redis
 # github.com/google/wire v0.4.0
 ## explicit
 github.com/google/wire

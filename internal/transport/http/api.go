@@ -11,10 +11,27 @@ type Config struct {
 	Port string `envconfig:"PORT"`
 }
 
+type IPExtractor interface {
+	GetIP(r *http.Request) string
+}
+
+type RealIPExtractor struct{}
+
+const forwardedHeader = "X-FORWARDED-FOR"
+
+func (ext RealIPExtractor) GetIP(r *http.Request) string {
+	forwarded := r.Header.Get(forwardedHeader)
+	if forwarded != "" {
+		return forwarded
+	}
+	return r.RemoteAddr
+}
+
 type Api struct {
 	*Config
-	Svc    *service.Service
-	server *http.Server `wire:"-"`
+	Svc         *service.Service
+	IpExtractor IPExtractor
+	server      *http.Server `wire:"-"`
 }
 
 func (api *Api) Server() *http.Server {
@@ -27,6 +44,10 @@ func (api *Api) Server() *http.Server {
 	linkrouter := r.PathPrefix("/link").Subrouter()
 	linkrouter.HandleFunc("/{hash}", api.getLink).Methods(http.MethodGet)
 	linkrouter.HandleFunc("/", api.addLink).Methods(http.MethodPost)
+
+	statrouter := r.PathPrefix("/stat").Subrouter()
+	statrouter.HandleFunc("/ip", api.getIPStat).Queries("from", "{from}").Queries("to", "{to}").Methods(http.MethodGet)
+	statrouter.HandleFunc("/url", api.getURLStat).Queries("from", "{from}").Queries("to", "{to}").Methods(http.MethodGet)
 
 	api.server = &http.Server{
 		Addr:    api.Port,

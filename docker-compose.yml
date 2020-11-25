@@ -13,11 +13,20 @@ services:
       HASH_MIN_LEN: 4
       SERVICE_DOMAIN: short
       HTTP_PORT: ":3001"
+      REDIS_ADDRESS: "redis:6379"
+      REDIS_MAX_IDLE: 100
+      REDIS_IDLE_TIME: 100
     depends_on:
       - db
     restart: always
     ports:
       - 3001:3001
+  
+  redis:
+    image: redis
+    ports:
+      - 6380:6379
+
   db:
     image: postgres
     restart: always

@@ -7,9 +7,11 @@ package main
 
 import (
 	"github.com/rs/zerolog"
+	"urlshortener/internal/builtin"
 	"urlshortener/internal/hashids"
 	"urlshortener/internal/inmem"
 	"urlshortener/internal/postgres"
+	"urlshortener/internal/redis"
 	"urlshortener/internal/service"
 	"urlshortener/internal/transport/http"
 )
@@ -27,19 +29,26 @@ func provideApp(logger zerolog.Logger, c *Config) *App {
 	serviceConfig := provideServiceConfig(c)
 	cache := provideCache(c)
 	decoder := provideHashDecoder(c)
+	backend := provideRedis(c)
+	timeFunc := pnovideTimeFunc()
 	serviceService := &service.Service{
-		Config: serviceConfig,
-		Store:  store,
-		Cache:  cache,
-		Codec:  decoder,
+		Config:   serviceConfig,
+		Store:    store,
+		Cache:    cache,
+		Codec:    decoder,
+		Hll:      backend,
+		TimeFunc: timeFunc,
 	}
+	realIPExtractor := provideIPExtractor()
 	api := &http.Api{
-		Config: config,
-		Svc:    serviceService,
+		Config:      config,
+		Svc:         serviceService,
+		IpExtractor: realIPExtractor,
 	}
 	app := &App{
 		Store: store,
 		API:   api,
+		Redis: backend,
 		Log:   logger,
 	}
 	return app
@@ -67,4 +76,18 @@ func provideHashDecoder(c *Config) hashids.Decoder {
 
 func provideCache(c *Config) *inmem.Cache {
 	return inmem.New(*c.Inmem)
+}
+
+func provideRedis(c *Config) *redis.Backend {
+	return &redis.Backend{
+		Config: c.Redis,
+	}
+}
+
+func provideIPExtractor() http.RealIPExtractor {
+	return http.RealIPExtractor{}
+}
+
+func pnovideTimeFunc() builtin.TimeFunc {
+	return builtin.TimeFunc{}
 }
