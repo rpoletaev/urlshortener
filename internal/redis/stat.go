@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"fmt"
 	"time"
 	"urlshortener/internal"
 
@@ -41,7 +40,6 @@ func (r *StatisticsRepository) addStat(keyPref string, date time.Time, val strin
 	defer con.Close()
 
 	key := keyPref + date.Format(layout)
-	fmt.Println("add", key, "val", val)
 	_, err := con.Do("PFADD", key, val)
 	return err
 }
@@ -50,12 +48,11 @@ func (r *StatisticsRepository) getStat(keyPref string, dateFrom, dateTo time.Tim
 	con := r.Pool.Get()
 	defer con.Close()
 
-	keys := []string{}
+	keys := []interface{}{}
 	for d := dateFrom; d.Before(dateTo); d = d.Add(24 * time.Hour) {
 		keys = append(keys, keyPref+d.Format(layout))
 	}
 
-	fmt.Println("keys", keys)
-	val, err := redis.Uint64(con.Do("PFCOUNT", keys))
+	val, err := redis.Uint64(con.Do("PFCOUNT", keys...))
 	return uint(val), err
 }
